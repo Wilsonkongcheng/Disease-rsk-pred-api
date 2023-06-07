@@ -1,0 +1,10 @@
+# +parser:tag=8888
+# +parser:param:namespace=cloudladder-apps-moa,release_name=moa-lung-rsk-pred-api
+serviceAccountName: cloudladder-apps
+commonAnnotations:
+  kubesphere.io/description: "玉环肺癌风险度计算接口"
+image:
+  fullname: ${image}
+apisix:
+  enabled: true
+  serviceNameOverride: "moa-lung-rsk-pred-api"
