@@ -15,5 +15,6 @@ RUN pip config set global.timeout 120
 RUN pip install .
 
 # 容器运行时的指令
-CMD [" uvicorn dophin_scheduler_app:app  --host 0.0.0.0 --port 3000"]
-EXPOSE 3000
+CMD [" uvicorn dophin_scheduler_app:app  --host 0.0.0.0 --port 80"]
+
+
