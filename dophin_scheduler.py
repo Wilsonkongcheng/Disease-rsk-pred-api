@@ -34,8 +34,8 @@ def main():
         # save to db like 20230515_113718.csv
         if not os.path.exists('./data'):
             os.mkdir('./data')
-        now = datetime.now()
-        save_path = f"./data/{now.year}{now.month}{now.day}_{now.hour}{now.minute}{now.second}.csv"
+        now = datetime.now().strftime("%Y%m%d_%H%M%S")
+        save_path = f"./data/{now}.csv"
         data.to_csv(save_path, index=False)
         # print(data.info())
 
@@ -45,7 +45,7 @@ def main():
         print(result_df.info())
 
         # save to csv
-        path = f'./data/{now.year}{now.month}{now.day}_{now.hour}{now.minute}{now.second}_result.csv'
+        path = f'./data/{now}_result.csv'
         result_df.to_csv(path, index_label='idx')
 
         #  save to DB
