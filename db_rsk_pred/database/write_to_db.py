@@ -16,7 +16,7 @@ def write_db(cfg_path, path=None, result_df: pd.DataFrame = None):
     result_df = result_df.astype(str).where(result_df.notna(), None)  # string类型可以插入None;int,float类型不可以插入None
     print(result_df.info())
     db.write_result(result_df)
-    logger.info(f'{path.split("/")[-1]}  saved to DB')
+    logger.info('Save to DB')
 
 
 if __name__ == '__main__':
