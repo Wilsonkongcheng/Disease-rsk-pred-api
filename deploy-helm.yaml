@@ -5,6 +5,14 @@ commonAnnotations:
   kubesphere.io/description: "玉环肺癌风险度计算接口"
 image:
   fullname: ${image}
+extraVolumes:
+  - name: moa-lung-rsk-pred-api-ini
+    configMap:
+      name: moa-lung-rsk-pred-api
+extraVolumeMounts:
+  - name: moa-lung-rsk-pred-api-ini
+    mountPath: /app/cfg_lung.ini
+    subPath: cfg_lung.ini
 apisix:
   enabled: true
   serviceNameOverride: "moa-lung-rsk-pred-api"
