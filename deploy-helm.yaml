@@ -1,18 +1,18 @@
-# +parser:tag=8888
-# +parser:param:namespace=cloudladder-apps-moa,release_name=moa-lung-rsk-pred-api
+# +parser:tag=5498
+# +parser:param:namespace=cloudladder-apps-moa,release_name=moa-lung-rsk-pred-api-yuhuan
 serviceAccountName: cloudladder-apps
 commonAnnotations:
   kubesphere.io/description: "玉环肺癌风险度计算接口"
 image:
   fullname: ${image}
 extraVolumes:
-  - name: moa-lung-rsk-pred-api-ini
+  - name: moa-lung-rsk-pred-api-yuhuan-ini
     configMap:
-      name: moa-lung-rsk-pred-api
+      name: moa-lung-rsk-pred-api-yuhuan
 extraVolumeMounts:
-  - name: moa-lung-rsk-pred-api-ini
+  - name: moa-lung-rsk-pred-api-yuhuan-ini
     mountPath: /app/cfg_lung.ini
     subPath: cfg_lung.ini
 apisix:
   enabled: true
-  serviceNameOverride: "moa-lung-rsk-pred-api"
+  serviceNameOverride: "moa-lung-rsk-pred-api-yuhuan"
