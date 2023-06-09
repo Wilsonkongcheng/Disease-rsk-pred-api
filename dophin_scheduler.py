@@ -5,6 +5,8 @@ from db_rsk_pred.database.write_to_db import write_db
 import os
 import argparse
 from datetime import datetime
+from db_rsk_pred.util.util import logger
+
 
 
 def main():
@@ -24,35 +26,41 @@ def main():
         open(args.cfg, 'rt', encoding='utf-8'), read_from_file=True)
     db = DB(cfg.db.host, cfg.db.port, cfg.db.user, cfg.db.password, cfg.db.db,
             cfg.source.table, cfg.source.cols, cfg.source.tgt)
-    sql = f'select {cfg.source.cols},{cfg.source.tgt} from {cfg.source.table} where etl_time>=curdate()'  # 5天前
-    print(sql)
-    data = db.fetch_data_new(sql_str=sql)
 
+    sql = f'select {cfg.source.cols},{cfg.source.tgt} from {cfg.source.table} where etl_time>=curdate()'  # 5天前
+
+    data = db.fetch_data_new(sql_str=sql)
+    print(data.info())
     # judge empty dataframe(if have updating datas)
     if data.empty:
         message = "There's no new update datas, exit!"
     else:
-        # save to db like 20230515_113718.csv
-        if not os.path.exists('./data'):
-            os.mkdir('./data')
-        now = datetime.now().strftime("%Y%m%d_%H%M%S")
-        save_path = f"./data/{now}.csv"
-        data.to_csv(save_path, index=False)
-        # print(data.info())
 
-        # predict
-        args.test_data = save_path
-        result_df = predict(args)
-        print(result_df.info())
+        if eval(cfg.result.save):
+            # save to csv like 20230515_113718.csv
+            if not os.path.exists('./data'):
+                os.mkdir('./data')
+            now = datetime.now().strftime("%Y%m%d_%H%M%S")
+            save_path = f"./data/{now}.csv"
+            data.to_csv(save_path, index=False)
+            logger.info(f'{save_path.split("/")[-1]}  saved to csv')
+            # predict
+            args.test_data = save_path
+            result_df = predict(args)
 
-        # save to csv
-        path = f'./data/{now}_result.csv'
-        result_df.to_csv(path, index_label='idx')
+            # save to csv
+            save_path = f'./data/{now}_result.csv'
+            result_df.to_csv(save_path, index_label='idx')
+            logger.info(f'{save_path.split("/")[-1]}  saved to csv')
+
+        else:
+            # predict
+            result_df = predict(args, ori_data=data)
 
         #  save to DB
         if eval(args.to_db):
-            save_path = path
-            write_db(args.cfg, save_path)
+            # save_path = path
+            write_db(args.cfg, result_df=result_df)
         message = "successfull update!"
 
     print(message)
@@ -60,4 +68,6 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+
+    message = main()
+
