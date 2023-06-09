@@ -42,7 +42,7 @@ app = FastAPI()
 
 @app.post("/test")
 async def root():
-    message = dophin_scheduler.main()
+    message = await dophin_scheduler.main()
     return {"message": message}
 
 
