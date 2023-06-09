@@ -26,7 +26,6 @@ def main():
     db = DB(cfg.db.host, cfg.db.port, cfg.db.user, cfg.db.password, cfg.db.db,
             cfg.source.table, cfg.source.cols, cfg.source.tgt)
     sql = f'select {cfg.source.cols},{cfg.source.tgt} from {cfg.source.table} where etl_time>=date_sub(curdate(), interval 5 day) limit 100'  # 5天前
-    print(sql)
     data = db.fetch_data_new(sql_str=sql)
     print(data.info())
     # judge empty dataframe(if have updating datas)
@@ -53,9 +52,7 @@ def main():
 
         else:
             # predict
-            result_df = predict(args, data=data)
-
-        print(result_df.info())
+            result_df = predict(args, ori_data=data)
 
         #  save to DB
         if eval(args.to_db):

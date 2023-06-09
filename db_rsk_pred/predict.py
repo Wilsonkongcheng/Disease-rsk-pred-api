@@ -36,19 +36,18 @@ def count_rsk(df: pd.DataFrame, cfg):
     return df[rsk].sum(axis=1)
 
 
-def predict(args, data: pd.DataFrame = None):
+def predict(args, ori_data: pd.DataFrame = None):
     cp = args.cfg
     cfg = config_from_ini(open(cp, 'rt', encoding='utf-8'), read_from_file=True)
     cols = cfg.source.cols
     cols = [c.strip() for c in cols.split(',') if len(c.strip()) > 0]
-    if data is None:
+    if ori_data is None:
         ori_data = pd.read_csv(f'{args.test_data}')
-    else:
-        ori_data = data
-    print(ori_data.info())
+        print(ori_data.info())
     processor = PreProcessor(cfg.preprocess.proc_func_path)
 
-    data, col_mapping = processor.process(ori_data)
+    data, col_mapping = processor.process(ori_data, cfg.source.id)
+    print(data.info())
     cols = [col_mapping[c] for c in cols if c != cfg.source.id]  # drop user_id
 
     model = Model(args.model)
