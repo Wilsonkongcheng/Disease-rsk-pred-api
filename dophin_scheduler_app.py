@@ -2,7 +2,7 @@ from fastapi import FastAPI, File, UploadFile
 import dophin_scheduler
 
 """
- 启动命令：uvicorn MoCA_ROI_app:app --reload --host 10.123.234.39 --port 65530
+ 启动命令：uvicorn dophin_scheduler_app:app --reload --host 0.0.0.0 --port 80
 """
 
 
@@ -40,9 +40,9 @@ app = FastAPI()
 
 
 
-@app.post("/test")
+@app.get("/test")
 async def root():
-    message = await dophin_scheduler.main()
+    message = dophin_scheduler.main()
     return {"message": message}
 
 
