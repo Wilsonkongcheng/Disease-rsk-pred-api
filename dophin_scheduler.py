@@ -6,6 +6,7 @@ import os
 import argparse
 from datetime import datetime
 
+
 def main():
     # global param
     parser = argparse.ArgumentParser()
@@ -17,13 +18,13 @@ def main():
     parser.add_argument("-M", "--model", default='./model.json')
     parser.add_argument("-e", "--explain", default='True', choices=['True', 'False'])
     parser.add_argument("-db", "--to_db", default='True', choices=['True', 'False'])
-    args = parser.parse_args([])   # [] 让解析器不要去解析CLI
+    args = parser.parse_args([])  # [] 让解析器不要去解析CLI
     # fetch new data from DB
     cfg = config_from_ini(
         open(args.cfg, 'rt', encoding='utf-8'), read_from_file=True)
     db = DB(cfg.db.host, cfg.db.port, cfg.db.user, cfg.db.password, cfg.db.db,
             cfg.source.table, cfg.source.cols, cfg.source.tgt)
-    sql = f'select {cfg.source.cols},{cfg.source.tgt} from {cfg.source.table} where etl_time>=date_sub(curdate(), interval 5 day) limit 100' # 5天前
+    sql = f'select {cfg.source.cols},{cfg.source.tgt} from {cfg.source.table} where etl_time>=curdate()'  # 5天前
     print(sql)
     data = db.fetch_data_new(sql_str=sql)
 
@@ -57,8 +58,6 @@ def main():
     print(message)
     return message
 
+
 if __name__ == '__main__':
     main()
-
-
-
