@@ -1,60 +1,34 @@
-from fastapi import FastAPI, File, UploadFile
-import dophin_scheduler
+from fastapi import FastAPI
+from dophin_scheduler import main
+import asyncio
 
 """
  启动命令：uvicorn dophin_scheduler_app:app --reload --host 0.0.0.0 --port 80
 """
 
-
 app = FastAPI()
-
-# single img upload
-
-# @app.post("/img_process")
-# async def create_processed_img(file: Union[UploadFile, None] = File(
-#     default=None, description="A image about complete MoCA quantity tabule photoed by user")):  # 比File有优势，更适用于处理图像、视频、二进制文件等大型文件，不会占用所有内存
-#     """
-#     Recoganize the ROI of MoCA quantity table
-#
-#     Parameters:
-#         file:Union[UploadFile, None]
-#             A received image file(jpg,png) upload by user
-#     Returns:
-#         ROI_JSON:JSON str
-#             a processed image include ROI
-#     """
-#
-#     print("file_name:", file.filename, "received")
-#     if not file:
-#         return {"message": "No upload image sent"}
-#     else:
-#         contents = await file.read()  # UploadFile->string
-#         nparr = np.fromstring(contents, np.uint8)  # str -> ndarray
-#         ori_img = cv.imdecode(nparr, cv.IMREAD_COLOR)
-#         ROI_show = MoCA_ROI_Crop.main(ori_img)
-#         _, encoded_ROI = cv.imencode(".jpg", ROI_show)  # ndarray->jpg
-#         ROI_bytes = encoded_ROI.tobytes()  # jpg->bytes
-#         print("successfully Rec")
-#         return Response(content=ROI_bytes, media_type="image/jpg")
+running = False
+message = None
 
 
-
-
-@app.get("/test")
+@app.get("/lung")
 async def root():
-    message = dophin_scheduler.main()
-    return {"message": message}
+    global running
+    running = True
+    asyncio.get_event_loop().run_in_executor(None, main)  # 开启线程异步计算
+    return {"message": "successfully submit"}
 
 
-
-## 识别
-# @app.get("/ROI_show/")
-# async def ROI_catch(image: np.ndarray):
-#     if not image:
-#         return {"message": "No image receive"}
-#     else:
-#         ROI_show = MoCA_ROI_Crop.main(image)
-#         return ROI_show
+@app.get("/is_complete")
+async def is_complete_api():
+    global running
+    if running:
+        return {"is_complete": 'False'}
+    else:
+        if message:
+            return {"is_complete": 'True', "message": message}
+        else:
+            return {"message": "No start!"}
 
 
 if __name__ == '__main__':

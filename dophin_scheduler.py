@@ -6,13 +6,14 @@ import os
 import argparse
 from datetime import datetime
 from db_rsk_pred.util.util import logger
-
-
+import time
+import dophin_scheduler_app
 
 def main():
+    start = time.time()
     # global param
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--cfg", default='./cfg_lung.ini')
+    parser.add_argument("-c", "--cfg", default='./cfg_stmc.ini')
     # global_args = parser.parse_args()
 
     # pred param
@@ -27,15 +28,17 @@ def main():
     db = DB(cfg.db.host, cfg.db.port, cfg.db.user, cfg.db.password, cfg.db.db,
             cfg.source.table, cfg.source.cols, cfg.source.tgt)
 
-    sql = f'select {cfg.source.cols},{cfg.source.tgt} from {cfg.source.table} where etl_time>=curdate()'  # 5天前
+    sql = f'select {cfg.source.cols},{cfg.source.tgt} from {cfg.source.table} where etl_time>=curdate()'
+    # sql = f'select {cfg.source.cols},{cfg.source.tgt} from {cfg.source.table} where etl_time>="2023-06-26"'
 
     data = db.fetch_data_new(sql_str=sql)
     print(data.info())
     # judge empty dataframe(if have updating datas)
     if data.empty:
-        message = "There's no new update datas, exit!"
-    else:
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        message = f"{now}: There's no new update datas, exit!"
 
+    else:
         if eval(cfg.result.save):
             # save to csv like 20230515_113718.csv
             if not os.path.exists('./data'):
@@ -56,18 +59,22 @@ def main():
         else:
             # predict
             result_df = predict(args, ori_data=data)
-
         #  save to DB
         if eval(args.to_db):
             # save_path = path
             write_db(args.cfg, result_df=result_df)
-        message = "successfull update!"
+
+        new_data_amount = result_df.shape[0]
+        now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        message = f"{now}: successfull update {new_data_amount} datas!"
 
     print(message)
-    return message
+    end = time.time()
+    print(f"duration:{end - start} seconds")
+    dophin_scheduler_app.running = False
+    dophin_scheduler_app.message = message
+    # return message
 
 
 if __name__ == '__main__':
-
     message = main()
-
