@@ -13,7 +13,7 @@ def main():
     start = time.time()
     # global param
     parser = argparse.ArgumentParser()
-    parser.add_argument("-c", "--cfg", default='./cfg_stmc.ini')
+    parser.add_argument("-c", "--cfg", default='./cfg_lung.ini')
     # global_args = parser.parse_args()
 
     # pred param
