@@ -8,6 +8,7 @@ from datetime import datetime
 from db_rsk_pred.util.util import logger
 import time
 import dophin_scheduler_app
+import tqdm
 
 def main():
     start = time.time()
@@ -58,13 +59,19 @@ def main():
 
         else:
             # predict
-            result_df = predict(args, ori_data=data)
-        #  save to DB
-        if eval(args.to_db):
-            # save_path = path
-            write_db(args.cfg, result_df=result_df)
+            # result_df = predict(args, ori_data=data)
+            batch_size = 5000
+            for i in tqdm.tqdm(range(0, len(data), batch_size)):
+                batch = data.iloc[i: i + batch_size]
+                batch_result = predict(args, ori_data=batch)
+                write_db(args.cfg, result_df=batch_result)
 
-        new_data_amount = result_df.shape[0]
+        #  save to DB
+        # if eval(args.to_db):
+        #     # save_path = path
+        #     write_db(args.cfg, result_df=result_df)
+
+        new_data_amount = data.shape[0]
         now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         message = f"{now}: successfull update {new_data_amount} datas!"
 
