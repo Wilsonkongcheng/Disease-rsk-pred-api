@@ -13,6 +13,10 @@ extraVolumeMounts:
   - name: moa-lung-rsk-pred-api-yuhuan-ini
     mountPath: /app/cfg_lung.ini
     subPath: cfg_lung.ini
+resources:
+  limits:
+    cpu: 2
+    memory: 3Gi
 apisix:
   enabled: true
   serviceNameOverride: "moa-lung-rsk-pred-api-yuhuan"
